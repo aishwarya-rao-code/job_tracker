@@ -143,8 +143,9 @@ with st.sidebar.form("add_event", clear_on_submit=True):
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🗓️ Upcoming Events")
-for event in sorted(calendar_events, key=lambda e: e['start']):
-    if st.sidebar.button(f"❌ {event['title']} on {event['start'][:10]}", key=event['start']):
+for idx, event in enumerate(sorted(calendar_events, key=lambda e: e['start'])):
+    label = f"❌ {event['title']} on {event['start'][:10]}"
+    if st.sidebar.button(label, key=f"delete_event_{idx}"):
         calendar_events.remove(event)
         with open(EVENTS_JSON, 'w') as f:
             json.dump(calendar_events, f)
