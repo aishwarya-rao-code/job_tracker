@@ -184,7 +184,14 @@ if st.session_state.role != "viewer":
                 "Resume": resume_path
             }
             df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
+            # Save to master file
             df.to_csv(TRACKER_CSV, index=False)
+
+            # Save to a dated file as well
+            daily_filename = f"logs/{today}_applications.csv"
+            os.makedirs("logs", exist_ok=True)
+            df[df["Date"] == today].to_csv(daily_filename, index=False)
+
 
             with open(SUMMARY_JSON, 'w') as f:
                 json.dump(summary_data, f)
@@ -243,6 +250,28 @@ if "edit_index" in st.session_state:
             del st.session_state.edit_index
             st.success("Application updated.")
             st.rerun()
+st.markdown("---")
+st.header("📅 View Applications by Date")
+
+all_logs = sorted([f for f in os.listdir("logs") if f.endswith(".csv")])
+dates_available = [f.split("_applications.csv")[0] for f in all_logs]
+
+if dates_available:
+    selected_date = st.selectbox("Select a date to view:", dates_available)
+
+    selected_path = os.path.join("logs", f"{selected_date}_applications.csv")
+    if os.path.exists(selected_path):
+        day_df = pd.read_csv(selected_path)
+        st.subheader(f"📄 Applications on {selected_date}")
+        for i, row in day_df[::-1].reset_index(drop=True).iterrows():
+            with st.expander(f"{row['Company']} ({row['Platform']}) - {row['Status']}"):
+                st.markdown(f"**Date:** {row['Date']}")
+                st.markdown(f"🔗 [Job Link]({row['Job Link']})")
+                st.markdown(f"📝 Notes: {row['Notes']}")
+                if row['Resume']:
+                    st.markdown(f"📎 [Download Resume]({row['Resume']})")
+else:
+    st.info("No historical data saved yet.")
 
 # --- EXPORT ---
 if st.button("💾 Export All to CSV"):
