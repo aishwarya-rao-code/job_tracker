@@ -1,0 +1,21 @@
+# Streamlit app framework
+streamlit==1.35.0
+
+# Data handling
+pandas==2.2.2
+
+# Email handling
+smtplib3==2.0.0
+email-validator==2.1.0.post1
+
+# For date and time
+python-dateutil==2.9.0.post0
+
+# File uploads and PDFs (optional if PDF handling grows later)
+fpdf==1.7.2
+
+# For compatibility
+numpy==1.26.4
+
+# For general environment consistency
+python-dotenv==1.0.1

@@ -1,0 +1,4 @@
+.vs/ 
+uploaded_resumes/ 
+*.pyc 
+__pycache__/ 
