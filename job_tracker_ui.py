@@ -11,7 +11,9 @@ TRACKER_CSV = "job_applications.csv"
 SUMMARY_JSON = "daily_summary.json"
 EVENTS_JSON = "calendar_events.json"
 UPLOAD_DIR = "uploaded_resumes"
+LOGS_DIR = "logs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 # --- USER AUTH ---
 USERS = {
@@ -254,7 +256,7 @@ if "edit_index" in st.session_state:
 st.markdown("---")
 st.header("📅 View Applications by Date")
 
-all_logs = sorted([f for f in os.listdir("logs") if f.endswith(".csv")])
+all_logs = sorted([f for f in os.listdir(LOGS_DIR) if f.endswith(".csv")])
 dates_available = [f.split("_applications.csv")[0] for f in all_logs]
 
 if dates_available:
