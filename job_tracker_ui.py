@@ -191,9 +191,10 @@ if st.session_state.role != "viewer":
             df.to_csv(TRACKER_CSV, index=False)
 
             # Save to a dated file as well
-            daily_filename = f"logs/{today}_applications.csv"
-            os.makedirs("logs", exist_ok=True)
+            daily_filename = os.path.join(LOGS_DIR, f"{today}_applications.csv")
+            os.makedirs(LOGS_DIR, exist_ok=True)
             df[df["Date"] == today].to_csv(daily_filename, index=False)
+
 
 
             with open(SUMMARY_JSON, 'w') as f:
@@ -271,8 +272,18 @@ if dates_available:
                 st.markdown(f"**Date:** {row['Date']}")
                 st.markdown(f"🔗 [Job Link]({row['Job Link']})")
                 st.markdown(f"📝 Notes: {row['Notes']}")
-                if row['Resume']:
-                    st.markdown(f"📎 [Download Resume]({row['Resume']})")
+                if row["Resume"] and os.path.exists(row["Resume"]): 
+                    with open(row["Resume"], "rb") as f:
+                        st.download_button(
+                            label="📎 Download Resume",
+                            data=f.rdaily_filenameead(),
+                            file_name=os.path.basename(row["Resume"]),
+                            mime="application/pdf",
+                            key=f"dl_{row['Company']}_{row['Date']}"
+                            )
+                else:
+                    st.caption("⚠️ Resume file not found.")
+                
 else:
     st.info("No historical data saved yet.")
 
