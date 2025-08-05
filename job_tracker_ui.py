@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
+import base64
 from datetime import date, datetime
 import os
 # Removed streamlit_calendar (replaced with built-in calendar layout)
@@ -14,6 +15,14 @@ UPLOAD_DIR = "uploaded_resumes"
 LOGS_DIR = "logs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(LOGS_DIR, exist_ok=True)
+def file_download_button(path, label):
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            data = f.read()
+        b64 = base64.b64encode(data).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(path)}">{label}</a>'
+        return href
+    return "⚠️ File not found."
 
 # --- USER AUTH ---
 USERS = {
@@ -216,8 +225,11 @@ if not df.empty:
             st.markdown(f"**Date:** {row['Date']}")
             st.markdown(f"🔗 [Job Link]({row['Job Link']})")
             st.markdown(f"📝 Notes: {row['Notes']}")
-            if row['Resume']:
-                st.markdown(f"📎 [Download Resume]({row['Resume']})")
+            if row["Resume"] and os.path.exists(row["Resume"]):
+                st.markdown(file_download_button(row["Resume"], "📎 Download Resume"), unsafe_allow_html=True)
+            else:
+                st.caption("⚠️ Resume file not found.")
+
 
             col1, col2 = st.columns(2)
             if col1.button("📝 Edit", key=f"edit_{i}"):
@@ -273,17 +285,11 @@ if dates_available:
                 st.markdown(f"**Date:** {row['Date']}")
                 st.markdown(f"🔗 [Job Link]({row['Job Link']})")
                 st.markdown(f"📝 Notes: {row['Notes']}")
-                if row["Resume"] and os.path.exists(row["Resume"]): 
-                    with open(row["Resume"], "rb") as f:
-                        st.download_button(
-                            label="📎 Download Resume",
-                            data = f.read(),
-                            file_name=os.path.basename(row["Resume"]),
-                            mime="application/pdf",
-                            key=f"dl_{row['Company']}_{row['Date']}"
-                            )
+                if row["Resume"] and os.path.exists(row["Resume"]):
+                    st.markdown(file_download_button(row["Resume"], "📎 Download Resume"), unsafe_allow_html=True)
                 else:
                     st.caption("⚠️ Resume file not found.")
+
                 
 else:
     st.info("No historical data saved yet.")
