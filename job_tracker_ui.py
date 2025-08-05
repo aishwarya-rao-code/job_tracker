@@ -218,7 +218,9 @@ if not df.empty:
             st.markdown(f"🔗 [Job Link]({row['Job Link']})")
             st.markdown(f"📝 Notes: {row['Notes']}")
             if row['Resume']:
-                st.markdown(f"📎 [Download Resume]({row['Resume']})")
+                web_safe_path = row['Resume'].replace("\\", "/")
+            st.markdown(f"📎 [Download Resume]({web_safe_path})")
+
 
             col1, col2 = st.columns(2)
             if col1.button("📝 Edit", key=f"edit_{i}"):
