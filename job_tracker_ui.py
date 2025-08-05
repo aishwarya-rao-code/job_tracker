@@ -172,7 +172,8 @@ if st.session_state.role != "viewer":
         if submit:
             resume_path = ""
             if resume_file:
-                safe_name = f"{today}_{company.replace(' ', '_')}_{resume_file.name}"
+                base = os.path.splitext(resume_file.name)[0].replace(" ", "_")
+                safe_name = f"{today}_{company.replace(' ', '_')}_{base}.pdf"
                 resume_path = os.path.join(UPLOAD_DIR, safe_name)
                 with open(resume_path, "wb") as f:
                     f.write(resume_file.read())
@@ -263,7 +264,7 @@ dates_available = [f.split("_applications.csv")[0] for f in all_logs]
 if dates_available:
     selected_date = st.selectbox("Select a date to view:", dates_available)
 
-    selected_path = os.path.join("logs", f"{selected_date}_applications.csv")
+    selected_path = os.path.join(LOGS_DIR, f"{selected_date}_applications.csv")
     if os.path.exists(selected_path):
         day_df = pd.read_csv(selected_path)
         st.subheader(f"📄 Applications on {selected_date}")
@@ -276,7 +277,7 @@ if dates_available:
                     with open(row["Resume"], "rb") as f:
                         st.download_button(
                             label="📎 Download Resume",
-                            data=f.rdaily_filenameead(),
+                            data = f.read(),
                             file_name=os.path.basename(row["Resume"]),
                             mime="application/pdf",
                             key=f"dl_{row['Company']}_{row['Date']}"
@@ -290,8 +291,10 @@ else:
 # --- EXPORT ---
 if st.button("💾 Export All to CSV"):
     df.to_csv(TRACKER_CSV, index=False)
-    with open(SUMMARY_JSON, 'w') as f:
+    # Auto-save checklist
+    with open(SUMMARY_JSON, "w") as f:
         json.dump(summary_data, f)
+
     st.success("📁 Tracker saved!")
 
 st.markdown("---")
